@@ -1,3 +1,5 @@
+import java.io.File
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -11,4 +13,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "gradle-kotlin"
+rootProject.name = "mcproto"
+include(":paket-kotlin")
+project(":paket-kotlin").projectDir = File("modules/paket-kotlin")

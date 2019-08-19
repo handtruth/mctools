@@ -5,7 +5,7 @@ plugins {
     jacoco
 }
 
-group = "com.handtruth"
+group = "com.handtruth.mc"
 version = "0.1.0"
 
 repositories {
@@ -13,7 +13,10 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":paket-kotlin"))
     implementation(kotlin("stdlib-jdk8"))
+    implementation(group = "com.fasterxml.jackson.core", name = "jackson-core", version = "2.9.9")
+    implementation(group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version = "2.9.9")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.5.1")
     testImplementation(kotlin("test"))
@@ -24,7 +27,7 @@ jacoco {
     reportsDir = file("$buildDir/customJacocoReportDir")
 }
 
-tasks{
+tasks {
     withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "1.8"
     }

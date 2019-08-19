@@ -1,0 +1,3 @@
+[submodule "paket-kotlin"]
+	path = modules/paket-kotlin
+	url = ../paket-kotlin.git
