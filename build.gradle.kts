@@ -13,10 +13,12 @@ repositories {
 }
 
 dependencies {
+    val jacksonVersion: String by project
+
     implementation(project(":paket-kotlin"))
     implementation(kotlin("stdlib-jdk8"))
-    implementation(group = "com.fasterxml.jackson.core", name = "jackson-core", version = "2.9.9")
-    implementation(group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version = "2.9.9")
+    implementation(group = "com.fasterxml.jackson.core", name = "jackson-core", version = jacksonVersion)
+    implementation(group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version = jacksonVersion)
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.5.1")
     testImplementation(kotlin("test"))
