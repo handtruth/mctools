@@ -11,5 +11,8 @@ pluginManagement {
 }
 
 rootProject.name = "mcproto"
-include(":paket-kotlin")
+include(
+    ":platform",
+    ":paket-kotlin"
+)
 project(":paket-kotlin").projectDir = File("modules/paket-kotlin")

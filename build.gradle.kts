@@ -6,26 +6,26 @@ plugins {
 }
 
 group = "com.handtruth.mc"
-version = "0.1.0"
+version = "0.1.1"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    val jacksonVersion: String by project
+    implementation(platform(project(":platform")))
 
     implementation(project(":paket-kotlin"))
     implementation(kotlin("stdlib-jdk8"))
-    implementation(group = "com.fasterxml.jackson.core", name = "jackson-core", version = jacksonVersion)
-    implementation(group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version = jacksonVersion)
+    implementation("com.fasterxml.jackson.core:jackson-core")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.5.1")
+    testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(kotlin("test"))
 }
 
 jacoco {
-    toolVersion = "0.8.4"
+    toolVersion = "0.8.5"
     reportsDir = file("$buildDir/customJacocoReportDir")
 }
 
