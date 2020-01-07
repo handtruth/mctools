@@ -11,12 +11,12 @@ class ChatObjectDeserializer : JsonDeserializer<ChatObject>() {
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): ChatObject {
         return when (p.currentToken) {
             JsonToken.VALUE_STRING -> deserializeString(p.text)
-            JsonToken.START_OBJECT -> p.readValueAs(ChatObject::class.java)
+            JsonToken.START_OBJECT -> deserializeObject(p)
             JsonToken.START_ARRAY -> {
                 val list = mutableListOf<ChatObject>()
                 readList@while (true) list += when (p.nextToken()) {
                     JsonToken.VALUE_STRING -> deserializeString(p.text)
-                    JsonToken.START_OBJECT -> p.readValueAs(ChatObject::class.java)
+                    JsonToken.START_OBJECT -> deserializeObject(p)
                     JsonToken.END_ARRAY -> break@readList
                     else -> throw IllegalStateException("Wrong Chat Object format")
                 }
@@ -32,6 +32,24 @@ class ChatObjectDeserializer : JsonDeserializer<ChatObject>() {
             }
             else -> throw IllegalStateException("Wrong Chat Object format")
         }
+    }
+
+    private fun deserializeObject(p: JsonParser): ChatObject {
+        val chat = p.readValueAs(ChatObject::class.java)
+        return if (chat.text.contains('§'))
+            deserializeString(chat.text).copy(
+                bold = chat.bold,
+                italic = chat.italic,
+                underlined = chat.underlined,
+                strikethrough = chat.strikethrough,
+                obfuscated = chat.obfuscated,
+                color = chat.color,
+                insertion = chat.insertion,
+                clickEvent = chat.clickEvent,
+                hoverEvent = chat.hoverEvent
+            )
+        else
+            chat
     }
 
     private fun deserializeString(value: String): ChatObject {
