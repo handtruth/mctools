@@ -21,25 +21,39 @@ data class ChatObject(
         val value: String
     )
 
+    private fun flat(builder: StringBuilder) {
+        builder.append(text)
+        for (each in extra)
+            each.flat(builder)
+    }
+
+    override fun toString(): String {
+        val builder = StringBuilder()
+        flat(builder)
+        return builder.toString()
+    }
+
+    val length: Int = text.length + extra.sumBy { it.length }
+
     @Suppress("unused")
-    enum class Color(val color: String, val css: String) {
-        Unknown("unknown", "white"),
-        Black("black", "black"),
-        DarkBlue("dark_blue", "darkblue"),
-        DarkGreen("dark_green", "darkgreen"),
-        DarkAqua("dark_aqua", "darkcyan"),
-        DarkRed("dark_red", "darkred"),
-        DarkPurple("dark_purple", "purple"),
-        Gold("gold", "gold"),
-        Gray("gray", "gray"),
-        DarkGray("dark_gray", "darkgray"),
-        Blue("blue", "blue"),
-        Green("green", "green"),
-        Aqua("aqua", "cyan"),
-        Red("red", "red"),
-        LightPurple("light_purple", "mediumorchid"),
-        Yellow("yellow", "yellow"),
-        White("white", "white");
+    enum class Color(val color: String, val css: String, val code: Int) {
+        Unknown("unknown", "white", 0),
+        Black("black", "black", 0x000000),
+        DarkBlue("dark_blue", "darkblue", 0x0000AA),
+        DarkGreen("dark_green", "darkgreen", 0x00AA00),
+        DarkAqua("dark_aqua", "darkcyan", 0x00AAAA),
+        DarkRed("dark_red", "darkred", 0xAA0000),
+        DarkPurple("dark_purple", "purple", 0xAA00AA),
+        Gold("gold", "gold", 0xFFAA00),
+        Gray("gray", "gray", 0xAAAAAA),
+        DarkGray("dark_gray", "darkgray", 0x555555),
+        Blue("blue", "blue", 0x5555FF),
+        Green("green", "green", 0x55FF55),
+        Aqua("aqua", "cyan", 0x55FFFF),
+        Red("red", "red", 0xFF5555),
+        LightPurple("light_purple", "mediumorchid", 0xFF55FF),
+        Yellow("yellow", "yellow", 0xFFFF55),
+        White("white", "white", 0xFFFFFF);
 
         @JsonValue
         override fun toString(): String {

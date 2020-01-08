@@ -37,17 +37,7 @@ class ChatObjectDeserializer : JsonDeserializer<ChatObject>() {
     private fun deserializeObject(p: JsonParser): ChatObject {
         val chat = p.readValueAs(ChatObject::class.java)
         return if (chat.text.contains('§'))
-            deserializeString(chat.text).copy(
-                bold = chat.bold,
-                italic = chat.italic,
-                underlined = chat.underlined,
-                strikethrough = chat.strikethrough,
-                obfuscated = chat.obfuscated,
-                color = chat.color,
-                insertion = chat.insertion,
-                clickEvent = chat.clickEvent,
-                hoverEvent = chat.hoverEvent
-            )
+            chat.copy(text = "", extra = listOf(deserializeString(chat.text)))
         else
             chat
     }
@@ -71,7 +61,7 @@ class ChatObjectDeserializer : JsonDeserializer<ChatObject>() {
         var end: Int
         while (true) {
             end = value.indexOf('§', begin)
-            if (end < 0) {
+            if (end == -1) {
                 +value.substring(begin)
                 break
             }
@@ -80,7 +70,7 @@ class ChatObjectDeserializer : JsonDeserializer<ChatObject>() {
                 break
             when (val c = value[end + 1]) {
                 // Colors section
-                in '0'..'9', in 'a'..'f', in 'A'..'F' -> ChatObject.Color.getByCode(c)
+                in '0'..'9', in 'a'..'f', in 'A'..'F' -> color = ChatObject.Color.getByCode(c)
                 // Format section
                 'k' -> obfuscated = true
                 'l' -> bold = true
