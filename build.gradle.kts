@@ -1,27 +1,44 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    id("com.gladed.androidgitversion")
     kotlin("jvm")
     jacoco
+    `maven-publish`
+}
+
+androidGitVersion {
+    prefix = "v"
 }
 
 group = "com.handtruth.mc"
-version = "0.2.1"
+version = androidGitVersion.name()
 
 repositories {
     mavenCentral()
+    maven("https://mvn.handtruth.com")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["kotlin"])
+        }
+    }
 }
 
 dependencies {
-    implementation(platform(project(":platform")))
+    val platformVersion: String by project
+    implementation(platform("com.handtruth.internal:platform:$platformVersion"))
 
-    implementation(project(":paket-kotlin"))
+    implementation("com.handtruth.mc:paket-kotlin:2.0.0")
+
     implementation(kotlin("stdlib-jdk8"))
     implementation("com.fasterxml.jackson.core:jackson-core")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit5"))
+    testImplementation("org.junit.jupiter:junit-jupiter-engine")
 }
 
 jacoco {
