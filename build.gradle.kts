@@ -1,66 +1,93 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+@file:Suppress("UNUSED_VARIABLE")
 
 plugins {
     id("com.gladed.androidgitversion")
-    kotlin("jvm")
-    jacoco
+    kotlin("multiplatform")
     `maven-publish`
+    jacoco
 }
 
 androidGitVersion {
     prefix = "v"
 }
 
-group = "com.handtruth.mc"
+group = "com.handtruth.example"
 version = androidGitVersion.name()
 
 repositories {
     mavenCentral()
-    maven("https://mvn.handtruth.com")
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["kotlin"])
+kotlin {
+    jvm()
+    js {
+        browser()
+        nodejs()
+    }
+    mingwX64()
+    mingwX86()
+    linuxX64()
+    linuxArm32Hfp()
+    linuxArm64()
+    wasm32()
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib"))
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit5"))
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib-js"))
+            }
+        }
+        val jsTest by getting {
+            dependencies {
+                implementation(kotlin("test-js"))
+            }
         }
     }
-}
-
-dependencies {
-    val platformVersion: String by project
-    implementation(platform("com.handtruth.internal:platform:$platformVersion"))
-
-    implementation("com.handtruth.mc:paket-kotlin:2.0.0")
-
-    implementation(kotlin("stdlib-jdk8"))
-    implementation("com.fasterxml.jackson.core:jackson-core")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-
-    testImplementation(kotlin("test-junit5"))
-    testImplementation("org.junit.jupiter:junit-jupiter-engine")
 }
 
 jacoco {
     toolVersion = "0.8.5"
-    reportsDir = file("$buildDir/customJacocoReportDir")
+    reportsDir = file("${buildDir}/jacoco-reports")
 }
 
 tasks {
-    withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-    withType<Test> {
-        useJUnitPlatform()
-        testLogging {
-            events("passed", "skipped", "failed")
-        }
-    }
-    jacocoTestReport {
+    val jvmTest by getting
+    val testCoverageReport by creating(JacocoReport::class) {
+        dependsOn(jvmTest)
+        group = "Reporting"
+        description = "Generate Jacoco coverage reports."
+        val coverageSourceDirs = arrayOf(
+                "commonMain/src",
+                "jvmMain/src"
+        )
+        val classFiles = file("${buildDir}/classes/kotlin/jvm/")
+                .walkBottomUp()
+                .toSet()
+        classDirectories.setFrom(classFiles)
+        sourceDirectories.setFrom(files(coverageSourceDirs))
+        additionalSourceDirs.setFrom(files(coverageSourceDirs))
+
+        executionData.setFrom(files("${buildDir}/jacoco/jvmTest.exec"))
         reports {
-            xml.isEnabled = false
+            xml.isEnabled = true
             csv.isEnabled = false
-            html.destination = file("$buildDir/jacocoHtml")
+            html.isEnabled = true
+            html.destination = file("${buildDir}/jacoco-reports/html")
         }
     }
 }
