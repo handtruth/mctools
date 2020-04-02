@@ -3,6 +3,7 @@
 plugins {
     id("com.gladed.androidgitversion")
     kotlin("multiplatform")
+    kotlin("plugin.serialization")
     `maven-publish`
     jacoco
 }
@@ -11,50 +12,95 @@ androidGitVersion {
     prefix = "v"
 }
 
-group = "com.handtruth.example"
+group = "com.handtruth.mc"
 version = androidGitVersion.name()
 
-repositories {
-    mavenCentral()
+val platformVersion: String by project
+
+allprojects {
+    repositories {
+        mavenCentral()
+        maven("https://mvn.handtruth.com")
+        jcenter()
+        maven("https://dl.bintray.com/korlibs/korlibs/")
+    }
+    configurations.all {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "com.handtruth.internal" && requested.name == "platform")
+                useVersion(platformVersion)
+        }
+    }
 }
 
 kotlin {
     jvm()
+    val useJS: String by project
+    val useJSBool = useJS == "true"
+    if (useJSBool)
     js {
-        browser()
+        browser {
+            testTask {
+                useKarma {
+                    usePhantomJS()
+                }
+            }
+        }
         nodejs()
     }
-    mingwX64()
-    mingwX86()
-    linuxX64()
-    linuxArm32Hfp()
-    linuxArm64()
-    wasm32()
     sourceSets {
+        fun mc(name: String) = "$group:$name"
+        fun kotlinx(name: String) = "org.jetbrains.kotlinx:kotlinx-$name"
+        all {
+            with(languageSettings) {
+                enableLanguageFeature("InlineClasses")
+                useExperimentalAnnotation("com.handtruth.mc.paket.ExperimentalPaketApi")
+                useExperimentalAnnotation("kotlin.ExperimentalUnsignedTypes")
+                useExperimentalAnnotation("kotlin.time.ExperimentalTime")
+            }
+            dependencies {
+                val handtruthPlatform = dependencies.platform("com.handtruth.internal:platform:$platformVersion")
+                implementation(handtruthPlatform)
+            }
+        }
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib"))
+                implementation(mc("paket-kotlin"))
+                implementation(kotlinx("io"))
+                implementation(kotlinx("serialization-runtime-common"))
+                implementation("com.soywiz.korlibs.korio:korio")
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
+                implementation("io.ktor:ktor-test-dispatcher")
+            }
+        }
+        val jvmMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib-jdk8"))
+                implementation(kotlinx("serialization-runtime"))
+                implementation("io.ktor:ktor-io-jvm")
             }
         }
         val jvmTest by getting {
             dependencies {
-                implementation(kotlin("test-junit5"))
+                implementation(kotlin("test-junit"))
+                implementation("io.ktor:ktor-test-dispatcher-jvm")
             }
         }
-        val jsMain by getting {
-            dependencies {
-                implementation(kotlin("stdlib-js"))
+        if (useJSBool) {
+            val jsMain by getting {
+                dependencies {
+                    implementation(kotlin("stdlib-js"))
+                }
             }
-        }
-        val jsTest by getting {
-            dependencies {
-                implementation(kotlin("test-js"))
+            val jsTest by getting {
+                dependencies {
+                    implementation(kotlin("test-js"))
+                }
             }
         }
     }
