@@ -38,7 +38,7 @@ class UUIDTest {
     @Serializable
     data class WithStringUUID(val uuid: String)
 
-    val json = Json(JsonConfiguration.Stable)
+    private val json = Json(JsonConfiguration.Stable)
 
     private fun serializeAndDeserialize(string: String) {
         val obj = WithDefaultUUID(UUID(string))

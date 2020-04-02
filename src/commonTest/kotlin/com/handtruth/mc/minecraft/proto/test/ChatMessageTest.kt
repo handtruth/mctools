@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 class ChatMessageTest {
 
     @Test
-    fun message() {
+    fun controlSequencesTest() {
         val expected = ChatMessage(
             extra = listOf(
                 ChatMessage(text = "Paradox Universe", color = ChatMessage.Color.DarkPurple, bold = true),
@@ -22,6 +22,9 @@ class ChatMessageTest {
         )
         val actual = parseControlSequences("§r§5§lParadox Universe§r §c(§7§oSpaceTech§r§c)§r §6§l§nQKM").flatten()
         assertEquals(expected, actual)
+        val string = actual.toString()
+        assertEquals("Paradox Universe (SpaceTech) QKM", string)
+        assertEquals(string.length, actual.length)
     }
 
 }

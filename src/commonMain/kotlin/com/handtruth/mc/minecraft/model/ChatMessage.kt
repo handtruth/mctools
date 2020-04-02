@@ -34,13 +34,11 @@ data class ChatMessage(
             each.flat(builder)
     }
 
-    /*
     override fun toString(): String {
         val builder = StringBuilder()
         flat(builder)
         return builder.toString()
     }
-    */
 
     val length: Int = text.length + extra.sumBy { it.length }
 
@@ -65,10 +63,9 @@ data class ChatMessage(
 
     fun flatten(): ChatMessage {
         val chats = mutableListOf<ChatMessage>()
-        val root = copy(extra = chats)
         flatten(chats)
         chats.removeAll { it.text == "" }
-        return root
+        return copy(extra = chats)
     }
 
     fun resolveControlSequences(): ChatMessage {

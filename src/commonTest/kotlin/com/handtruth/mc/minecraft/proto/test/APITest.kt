@@ -4,6 +4,7 @@ import com.handtruth.mc.minecraft.MinecraftClient
 import com.handtruth.mc.minecraft.UUID
 import com.handtruth.mc.minecraft.model.ChatMessage
 import com.handtruth.mc.minecraft.model.ServerStatus
+import com.handtruth.mc.minecraft.use
 import com.handtruth.mc.minecraft.util.buildChat
 import io.ktor.test.dispatcher.testSuspend
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,8 +19,9 @@ class APITest {
     @Test
     fun getVanillaStatus() = testSuspend {
         withTimeout(3.seconds) {
-            val client = MinecraftClient("vanilla.mc.handtruth.com", 25565)
-            println(client.getStatus())
+            MinecraftClient("vanilla.mc.handtruth.com", 25565).use {
+                println(it.getStatus())
+            }
         }
     }
 
@@ -82,24 +84,30 @@ class APITest {
 
     @ExperimentalCoroutinesApi @Test
     fun getExampleStatus() = testSuspend {
-        val client = MinecraftClient("example.mc.handtruth.com", 25565)
-        val status = client.getStatus()
-        assertNotNull(status.favicon)
-        val expected = exampleStatus.copy(favicon = status.favicon)
-        assertEquals(expected.description, status.description)
-        assertEquals(expected, status)
-        client.ping().take(3).collect()
+        MinecraftClient("example.mc.handtruth.com", 25565).use { client ->
+            val status = client.getStatus()
+            assertNotNull(status.favicon)
+            val expected = exampleStatus.copy(favicon = status.favicon)
+            assertEquals(expected.description, status.description)
+            val string = status.description.toString()
+            assertEquals(" Ассоцииции с летающим квадракоптером", string)
+            assertEquals(string.length, status.description.length)
+            assertEquals(expected, status)
+            client.ping().take(3).collect()
+            client.disconnect()
+        }
     }
 
     @ExperimentalCoroutinesApi @Test
     fun pingVanilla() = testSuspend {
-        val client = MinecraftClient("vanilla.mc.handtruth.com", 25565)
-        val ping = client.ping()
-            .drop(1)
-            .take(10)
-            .withIndex()
-            .map { (i, ping) -> println("#$i -> $ping"); ping.inMilliseconds }
-            .reduce { a, b -> a + b } / 10
-        println("${ping}ms")
+        MinecraftClient("vanilla.mc.handtruth.com", 25565).use { client ->
+            val ping = client.ping()
+                .drop(1)
+                .take(10)
+                .withIndex()
+                .map { (i, ping) -> println("#$i -> $ping"); ping.inMilliseconds }
+                .reduce { a, b -> a + b } / 10
+            println("${ping}ms")
+        }
     }
 }
