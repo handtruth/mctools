@@ -20,11 +20,16 @@ class ChatMessageTest {
                 ChatMessage(text = "QKM", color = ChatMessage.Color.Gold, bold = true, underlined = true)
             )
         )
-        val actual = parseControlSequences("§r§5§lParadox Universe§r §c(§7§oSpaceTech§r§c)§r §6§l§nQKM").flatten()
+        val actual = parseControlSequences("§r§5§lParadox Universe§r §c(§7§oSpaceTech§r§c)§r §6§l§nQKM")
         assertEquals(expected, actual)
         val string = actual.toString()
         assertEquals("Paradox Universe (SpaceTech) QKM", string)
         assertEquals(string.length, actual.length)
-    }
 
+        val boxed = ChatMessage(
+            text = "§r§5§lParadox Universe",
+            extra = listOf(ChatMessage("§r §c(§7§oSpaceTech§r§c)§r §6§l§nQKM"))
+        ).resolveControlSequences().flatten()
+        assertEquals(expected, boxed)
+    }
 }

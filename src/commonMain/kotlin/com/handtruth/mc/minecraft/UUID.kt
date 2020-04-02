@@ -74,7 +74,7 @@ private inline val String.guidOff get() = if (get(0) == '{') 1 else 0
 data class UUID(val most: Long, val least: Long) {
     constructor() : this(0, 0)
     constructor(string: String) : this(sumPart(string, string.guidOff), sumPart(string, 16 + string.guidOff)) {
-        require(string[0] != '{' || string.last() == '}') { "malformed GUID format" }
+        require((string[0] == '{') == (string.last() == '}')) { "malformed GUID format" }
     }
 
     companion object {

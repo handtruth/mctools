@@ -7,6 +7,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 
 class UUIDTest {
     @Test
@@ -19,9 +20,17 @@ class UUIDTest {
         }
         with(UUID("{Fedcb9a-876504321---10589-985--12216559}")) {
             assertEquals(UUID(0xFedcb9a_876504321u.toLong(), 0x10589_985__12216559), this)
+            assertEquals(0xFedcb9a_876504321u.toLong(), most)
+            assertEquals(0x10589_985__12216559, least)
             assertEquals("fedcb9a8-7650-4321-1058-998512216559", this.toString())
             assertEquals("fedcb9a8765043211058998512216559", this.toMojangUUID())
             assertEquals("{fedcb9a8-7650-4321-1058-998512216559}", this.toGUID())
+        }
+        assertFails {
+            UUID("{Fedcb9a-876504321---10589-985--12216559")
+        }
+        assertFails {
+            UUID("Fedcb9a-876504321---10589-985--12216559}")
         }
     }
 
@@ -39,13 +48,6 @@ class UUIDTest {
     data class WithStringUUID(val uuid: String)
 
     private val json = Json(JsonConfiguration.Stable)
-
-    private fun serializeAndDeserialize(string: String) {
-        val obj = WithDefaultUUID(UUID(string))
-        val serial = json.stringify(WithDefaultUUID.serializer(), obj)
-        val str = json.parse(WithStringUUID.serializer(), serial)
-        assertEquals(string, str.uuid)
-    }
 
     @Test
     fun defaultSerializerTest() {
