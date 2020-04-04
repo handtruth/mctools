@@ -3,6 +3,7 @@ package com.handtruth.mc.minecraft.proto.test
 import com.handtruth.mc.minecraft.MinecraftClient
 import com.handtruth.mc.minecraft.UUID
 import com.handtruth.mc.minecraft.model.ChatMessage
+import com.handtruth.mc.minecraft.model.Player
 import com.handtruth.mc.minecraft.model.ServerStatus
 import com.handtruth.mc.minecraft.use
 import com.handtruth.mc.minecraft.util.buildChat
@@ -34,15 +35,15 @@ class APITest {
             players = ServerStatus.Players(
                 max = 250, online = 19,
                 sample = listOf(
-                    ServerStatus.Players.Player(
+                    Player(
                         id = UUID("c683771d-8246-4e14-9db0-528b63c265cb"),
                         name = "Popka"
                     ),
-                    ServerStatus.Players.Player(
+                    Player(
                         id = UUID("80d86712-45be-445e-b16c-5861eacd9624"),
                         name = "Zopka"
                     ),
-                    ServerStatus.Players.Player(
+                    Player(
                         id = UUID("12b53aaf-4a1c-48d9-a3f3-3b40e220c541"),
                         name = "Player"
                     )

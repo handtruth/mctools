@@ -2,7 +2,6 @@
 
 package com.handtruth.mc.minecraft.model
 
-import com.handtruth.mc.minecraft.UUID
 import com.handtruth.mc.minecraft.UUIDSerializer
 import com.handtruth.mc.minecraft.util.ChatMessageSerializer
 import kotlinx.serialization.Serializable
@@ -25,11 +24,5 @@ data class ServerStatus(
         val max: Int,
         val online: Int,
         val sample: List<Player>?
-    ) {
-        @Serializable
-        data class Player(
-            val name: String,
-            val id: UUID
-        )
-    }
+    )
 }

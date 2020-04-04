@@ -65,10 +65,11 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib"))
-                implementation(mc("paket-kotlin"))
+                implementation(mc("paket-kotlin:2.3.0"))
                 implementation(kotlinx("io"))
                 implementation(kotlinx("serialization-runtime-common"))
                 implementation("com.soywiz.korlibs.korio:korio")
+                implementation("io.ktor:ktor-client-core")
             }
         }
         val commonTest by getting {
@@ -83,6 +84,8 @@ kotlin {
                 implementation(kotlin("stdlib-jdk8"))
                 implementation(kotlinx("serialization-runtime"))
                 implementation("io.ktor:ktor-io-jvm")
+                implementation("io.ktor:ktor-client-core-jvm")
+                implementation("io.ktor:ktor-client-cio")
             }
         }
         val jvmTest by getting {

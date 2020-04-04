@@ -2,17 +2,23 @@ package com.handtruth.mc.minecraft.util
 
 import com.handtruth.mc.minecraft.model.ChatMessage
 
+@DslMarker
+annotation class ChatMessageDsl
+
 class ChatMessageBuilder {
     @PublishedApi internal val chats = mutableListOf<ChatMessage>()
 
+    @ChatMessageDsl
     operator fun ChatMessage.unaryPlus() {
         chats += this
     }
 
+    @ChatMessageDsl
     fun text(string: String) {
         +ChatMessage(text = string)
     }
 
+    @ChatMessageDsl
     inline fun <R> bold(value: Boolean = true, block: ChatMessageBuilder.() -> R): R {
         val builder = ChatMessageBuilder()
         val result = builder.block()
@@ -20,6 +26,7 @@ class ChatMessageBuilder {
         return result
     }
 
+    @ChatMessageDsl
     inline fun <R> italic(value: Boolean = true, block: ChatMessageBuilder.() -> R): R {
         val builder = ChatMessageBuilder()
         val result = builder.block()
@@ -27,6 +34,7 @@ class ChatMessageBuilder {
         return result
     }
 
+    @ChatMessageDsl
     inline fun <R> underlined(value: Boolean = true, block: ChatMessageBuilder.() -> R): R {
         val builder = ChatMessageBuilder()
         val result = builder.block()
@@ -34,6 +42,7 @@ class ChatMessageBuilder {
         return result
     }
 
+    @ChatMessageDsl
     inline fun <R> strikethrough(value: Boolean = true, block: ChatMessageBuilder.() -> R): R {
         val builder = ChatMessageBuilder()
         val result = builder.block()
@@ -41,6 +50,7 @@ class ChatMessageBuilder {
         return result
     }
 
+    @ChatMessageDsl
     inline fun <R> obfuscated(value: Boolean = true, block: ChatMessageBuilder.() -> R): R {
         val builder = ChatMessageBuilder()
         val result = builder.block()
@@ -48,6 +58,7 @@ class ChatMessageBuilder {
         return result
     }
 
+    @ChatMessageDsl
     inline fun <R> color(value: ChatMessage.Color, block: ChatMessageBuilder.() -> R): R {
         val builder = ChatMessageBuilder()
         val result = builder.block()
@@ -58,6 +69,7 @@ class ChatMessageBuilder {
     fun build() = ChatMessage(extra = chats)
 }
 
+@ChatMessageDsl
 inline fun buildChat(block: ChatMessageBuilder.() -> Unit): ChatMessage {
     val builder = ChatMessageBuilder()
     builder.block()
