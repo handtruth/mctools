@@ -2,7 +2,8 @@ package com.handtruth.mc.minecraft.util
 
 import kotlinx.io.Input
 import kotlinx.io.buffer.Buffer
-import kotlinx.io.text.readUtf8LineTo
+import kotlinx.io.text.readUtf8String
+import kotlinx.io.use
 
 private class Base64DecoderInput(val value: String): Input() {
     var index = 0
@@ -56,8 +57,4 @@ private class Base64DecoderInput(val value: String): Input() {
 
 fun base64decoder(value: String): Input = Base64DecoderInput(value)
 
-fun decodeBase64AsString(value: String) = buildString {
-    val input = base64decoder(value)
-    input.readUtf8LineTo(this)
-    input.close()
-}
+fun decodeBase64AsString(value: String) = base64decoder(value).use { it.readUtf8String() }

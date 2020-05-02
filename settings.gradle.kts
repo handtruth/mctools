@@ -15,4 +15,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "mcproto"
+rootProject.name = "mctools"

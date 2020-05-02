@@ -19,9 +19,8 @@ val platformVersion: String by project
 
 allprojects {
     repositories {
-        mavenCentral()
-        maven("https://mvn.handtruth.com")
         jcenter()
+        maven("https://mvn.handtruth.com")
         maven("https://dl.bintray.com/korlibs/korlibs/")
     }
     configurations.all {
@@ -115,7 +114,7 @@ jacoco {
 }
 
 tasks {
-    val jvmTest by getting
+    val jvmTest by getting {}
     val testCoverageReport by creating(JacocoReport::class) {
         dependsOn(jvmTest)
         group = "Reporting"

@@ -40,7 +40,7 @@ data class ChatMessage(
         return builder.toString()
     }
 
-    val length: Int = text.length + extra.sumBy { it.length }
+    val length: Int get() = text.length + extra.sumBy { it.length }
 
     private fun flatten(chats: MutableList<ChatMessage>, extra: List<ChatMessage> = this.extra) {
         for (chat in extra) {
