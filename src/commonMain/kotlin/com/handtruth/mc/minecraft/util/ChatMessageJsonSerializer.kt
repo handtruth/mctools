@@ -1,7 +1,6 @@
 package com.handtruth.mc.minecraft.util
 
 import com.handtruth.mc.minecraft.model.ChatMessage
-import kotlinx.serialization.Serializer
 import kotlinx.serialization.json.*
 
 object ChatMessageJsonSerializer : JsonTransformingSerializer<ChatMessage>(
