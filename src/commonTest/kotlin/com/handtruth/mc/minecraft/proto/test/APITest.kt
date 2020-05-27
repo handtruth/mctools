@@ -7,6 +7,7 @@ import com.handtruth.mc.minecraft.model.Player
 import com.handtruth.mc.minecraft.model.ServerStatus
 import com.handtruth.mc.minecraft.use
 import com.handtruth.mc.minecraft.util.buildChat
+import com.handtruth.mc.minecraft.util.toChatString
 import io.ktor.test.dispatcher.testSuspend
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -83,23 +84,6 @@ class APITest {
                 }
             }
         )
-    }
-
-    @Test
-    fun lol() {
-        val chat = buildChat {
-            color(ChatMessage.Color.Gold) {
-                bold {
-                    text("Hello")
-                }
-                text(" ")
-                italic {
-                    text("World!!!")
-                }
-            }
-        }
-        val json = Json(JsonConfiguration.Stable.copy(encodeDefaults = false))
-        assertEquals("""{"extra":[{"text":"Hello","bold":true,"color":"gold"},{"text":" ","color":"gold"},{"text":"World!!!","italic":true,"color":"gold"}]}""", json.stringify(ChatMessage.serializer(), chat))
     }
 
     @ExperimentalCoroutinesApi @Test

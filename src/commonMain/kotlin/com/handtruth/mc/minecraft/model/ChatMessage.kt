@@ -1,16 +1,17 @@
-@file:UseSerializers(ColorSerializer::class, ChatMessageSerializer::class)
+@file:UseSerializers(ChatMessageJsonSerializer::class)
 
 package com.handtruth.mc.minecraft.model
 
-import com.handtruth.mc.minecraft.util.ChatMessageSerializer
-import com.handtruth.mc.minecraft.util.ColorSerializer
+import com.handtruth.mc.minecraft.util.ChatMessageJsonSerializer
+import com.handtruth.mc.minecraft.util.json
 import com.handtruth.mc.minecraft.util.parseControlSequences
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
 @Serializable
 data class ChatMessage(
-    val text: String = "",
+    val text: String,
     val bold: Boolean? = null,
     val italic: Boolean? = null,
     val underlined: Boolean? = null,
@@ -22,25 +23,26 @@ data class ChatMessage(
     val hoverEvent: ChatEvent? = null,
     val extra: List<ChatMessage> = emptyList()
 ) {
-    @Serializable
-    data class ChatEvent(
-        val action: String,
-        val value: String
-    )
 
-    private fun flat(builder: Appendable) {
+    val isPlain: Boolean
+        get() {
+            val nullable =
+                bold ?: italic ?: underlined ?: strikethrough ?: obfuscated ?: color ?: insertion ?: clickEvent
+                ?: hoverEvent
+            return nullable == null && extra.isEmpty()
+        }
+
+    private fun stringify(builder: Appendable) {
         builder.append(text)
         for (each in extra)
-            each.flat(builder)
+            each.stringify(builder)
     }
 
-    override fun toString(): String {
-        val builder = StringBuilder()
-        flat(builder)
-        return builder.toString()
-    }
+    fun toChatString() = json.stringify(ChatMessageJsonSerializer, this)
 
     val length: Int get() = text.length + extra.sumBy { it.length }
+
+    override fun toString(): String = buildString { stringify(this) }
 
     private fun flatten(chats: MutableList<ChatMessage>, extra: List<ChatMessage> = this.extra) {
         for (chat in extra) {
@@ -73,25 +75,32 @@ data class ChatMessage(
         return copy(text = "", extra = listOf(chat) + extra.map { it.resolveControlSequences() })
     }
 
+    @Serializable
+    data class ChatEvent(
+        val action: String,
+        val value: String
+    )
+
     @Suppress("unused")
+    @Serializable
     enum class Color(val color: String, val css: String, val code: Int) {
-        Unknown("unknown", "black", 0),
-        Black("black", "black", 0x000000),
-        DarkBlue("dark_blue", "darkblue", 0x0000AA),
-        DarkGreen("dark_green", "darkgreen", 0x00AA00),
-        DarkAqua("dark_aqua", "darkcyan", 0x00AAAA),
-        DarkRed("dark_red", "darkred", 0xAA0000),
-        DarkPurple("dark_purple", "purple", 0xAA00AA),
-        Gold("gold", "gold", 0xFFAA00),
-        Gray("gray", "gray", 0xAAAAAA),
-        DarkGray("dark_gray", "darkgray", 0x555555),
-        Blue("blue", "blue", 0x5555FF),
-        Green("green", "green", 0x55FF55),
-        Aqua("aqua", "cyan", 0x55FFFF),
-        Red("red", "red", 0xFF5555),
-        LightPurple("light_purple", "mediumorchid", 0xFF55FF),
-        Yellow("yellow", "yellow", 0xFFFF55),
-        White("white", "white", 0xFFFFFF);
+        @SerialName("unknown") Unknown("unknown", "black", 0),
+        @SerialName("black") Black("black", "black", 0x000000),
+        @SerialName("dark_blue") DarkBlue("dark_blue", "darkblue", 0x0000AA),
+        @SerialName("dark_green") DarkGreen("dark_green", "darkgreen", 0x00AA00),
+        @SerialName("dark_aqua") DarkAqua("dark_aqua", "darkcyan", 0x00AAAA),
+        @SerialName("dark_red") DarkRed("dark_red", "darkred", 0xAA0000),
+        @SerialName("dark_purple") DarkPurple("dark_purple", "purple", 0xAA00AA),
+        @SerialName("gold") Gold("gold", "gold", 0xFFAA00),
+        @SerialName("gray") Gray("gray", "gray", 0xAAAAAA),
+        @SerialName("dark_gray") DarkGray("dark_gray", "darkgray", 0x555555),
+        @SerialName("blue") Blue("blue", "blue", 0x5555FF),
+        @SerialName("green") Green("green", "green", 0x55FF55),
+        @SerialName("aqua") Aqua("aqua", "cyan", 0x55FFFF),
+        @SerialName("red") Red("red", "red", 0xFF5555),
+        @SerialName("light_purple") LightPurple("light_purple", "mediumorchid", 0xFF55FF),
+        @SerialName("yellow") Yellow("yellow", "yellow", 0xFFFF55),
+        @SerialName("white") White("white", "white", 0xFFFFFF);
 
         override fun toString(): String {
             return color

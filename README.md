@@ -71,7 +71,7 @@ println("Skin: ${textures.skin}")
 println("Is Alex model?: ${textures.isAlex}")
 ```
 
-Thats all. If you need more, you can create an issue in this repository
+That's all. If you need more, you can create an issue in this repository
 or even create a pull request ;)
 
 ### Chat Message
@@ -82,7 +82,7 @@ sends this object in description field of the server status.
 You can get an actual length of this object in characters with property
 `ChatMessage::length`
 
-You can simplify it's structure with `ChatMessage::flatten` method.
+You can simplify its structure with `ChatMessage::flatten` method.
 
 A lot of Minecraft servers use control sequences in their description
 to decorate text. You can parse this sequences with
@@ -92,6 +92,9 @@ new `ChatMessage` with parsed control sequences.
 
 `ChatObject::toString` clears all the decoration on the ChatMessage
 object and returns a simple `String`.
+
+`ChatObject::toChatString` creates JSON string that represents Chat
+message. You can use it to generate `tellraw` command, for an instance.
 
 If you need to create your own `ChatMessage` object you can either
 use its constructor or `ChatMessage` builder.
@@ -120,7 +123,10 @@ val chat = buildChat {
 }
 ```
 
-`ChatMessage` object was designed to be simple enough to use in your
+`buildChat` is a very smart function. It tries to make the result object
+simple as possible.
+
+`ChatMessage` object was designed to be simple enough to be used in your
 own code not only for reading but also for construction.
 
 For example, you can create a valid tellraw command like this.
@@ -137,11 +143,9 @@ val chat = buildChat {
         }
     }
 }
-// Json from kotlinx.serialization
-val json = Json(JsonConfiguration.Stable.copy(encodeDefaults = false))
-println("/tellraw @a ${json.stringify(ChatMessage.serializer(), chat)}")
+println("/tellraw @a ${chat.toChatString()}")
 /* Output
-/tellraw @a {"extra":[{"text":"Hello","bold":true,"color":"gold"},{"text":" ","color":"gold"},{"text":"World!!!","italic":true,"color":"gold"}]}
+/tellraw @a ["",{"text":"Hello","bold":true,"color":"gold"},{"text":" ","color":"gold"},{"text":"World!!!","italic":true,"color":"gold"}]
 */
 ```
 

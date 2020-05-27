@@ -1,15 +1,19 @@
 package com.handtruth.mc.minecraft.proto.test
 
 import com.handtruth.mc.minecraft.model.ChatMessage
+import com.handtruth.mc.minecraft.util.buildChat
 import com.handtruth.mc.minecraft.util.parseControlSequences
+import com.handtruth.mc.minecraft.util.toChatString
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class ChatMessageTest {
 
     @Test
     fun controlSequencesTest() {
         val expected = ChatMessage(
+            "",
             extra = listOf(
                 ChatMessage(text = "Paradox Universe", color = ChatMessage.Color.DarkPurple, bold = true),
                 ChatMessage(text = " "),
@@ -31,5 +35,46 @@ class ChatMessageTest {
             extra = listOf(ChatMessage("§r §c(§7§oSpaceTech§r§c)§r §6§l§nQKM"))
         ).resolveControlSequences().flatten()
         assertEquals(expected, boxed)
+    }
+
+    @Test
+    fun stringFormat() {
+        val chat = buildChat {
+            color(ChatMessage.Color.Gold) {
+                bold {
+                    text("Hello")
+                }
+                text(" ")
+                italic {
+                    text("World!!!")
+                }
+            }
+            text(" Plain")
+        }
+        assertEquals(
+            """["",{"text":"Hello","bold":true,"color":"gold"},{"text":" ","color":"gold"},{"text":"World!!!","italic":true,"color":"gold"}," Plain"]""",
+            chat.toChatString()
+        )
+        assertEquals(
+            """[{"text":"Hello","bold":true,"color":"gold"},{"text":" ","color":"gold"},{"text":"World!!!","italic":true,"color":"gold"}," Plain"]""",
+            chat.extra.toChatString()
+        )
+
+        val simple = buildChat {
+            text("Text")
+        }
+        assertEquals("\"Text\"", simple.toChatString())
+        assertTrue { simple.isPlain }
+
+        val ordinal = buildChat {
+            bold {
+                italic {
+                    color(ChatMessage.Color.Gold) {
+                        text("Ordinal")
+                    }
+                }
+            }
+        }
+        assertEquals("""{"text":"Ordinal","bold":true,"italic":true,"color":"gold"}""", ordinal.toChatString())
     }
 }

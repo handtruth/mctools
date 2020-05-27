@@ -1,9 +1,9 @@
-@file:UseSerializers(UUIDSerializer.Default::class, ChatMessageSerializer::class)
+@file:UseSerializers(UUIDSerializer.Default::class, ChatMessageJsonSerializer::class)
 
 package com.handtruth.mc.minecraft.model
 
 import com.handtruth.mc.minecraft.UUIDSerializer
-import com.handtruth.mc.minecraft.util.ChatMessageSerializer
+import com.handtruth.mc.minecraft.util.ChatMessageJsonSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 

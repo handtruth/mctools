@@ -1,6 +1,7 @@
 package com.handtruth.mc.minecraft.util
 
 import com.handtruth.mc.minecraft.model.ChatMessage
+import kotlinx.serialization.builtins.list
 
 @DslMarker
 annotation class ChatMessageDsl
@@ -22,7 +23,7 @@ class ChatMessageBuilder {
     inline fun <R> bold(value: Boolean = true, block: ChatMessageBuilder.() -> R): R {
         val builder = ChatMessageBuilder()
         val result = builder.block()
-        +ChatMessage(bold = value, extra = builder.chats)
+        +ChatMessage("", bold = value, extra = builder.chats)
         return result
     }
 
@@ -30,7 +31,7 @@ class ChatMessageBuilder {
     inline fun <R> italic(value: Boolean = true, block: ChatMessageBuilder.() -> R): R {
         val builder = ChatMessageBuilder()
         val result = builder.block()
-        +ChatMessage(italic = value, extra = builder.chats)
+        +ChatMessage("", italic = value, extra = builder.chats)
         return result
     }
 
@@ -38,7 +39,7 @@ class ChatMessageBuilder {
     inline fun <R> underlined(value: Boolean = true, block: ChatMessageBuilder.() -> R): R {
         val builder = ChatMessageBuilder()
         val result = builder.block()
-        chats += ChatMessage(underlined = value, extra = builder.chats)
+        chats += ChatMessage("", underlined = value, extra = builder.chats)
         return result
     }
 
@@ -46,7 +47,7 @@ class ChatMessageBuilder {
     inline fun <R> strikethrough(value: Boolean = true, block: ChatMessageBuilder.() -> R): R {
         val builder = ChatMessageBuilder()
         val result = builder.block()
-        chats += ChatMessage(strikethrough = value, extra = builder.chats)
+        chats += ChatMessage("", strikethrough = value, extra = builder.chats)
         return result
     }
 
@@ -54,7 +55,7 @@ class ChatMessageBuilder {
     inline fun <R> obfuscated(value: Boolean = true, block: ChatMessageBuilder.() -> R): R {
         val builder = ChatMessageBuilder()
         val result = builder.block()
-        chats += ChatMessage(obfuscated = value, extra = builder.chats)
+        chats += ChatMessage("", obfuscated = value, extra = builder.chats)
         return result
     }
 
@@ -62,18 +63,21 @@ class ChatMessageBuilder {
     inline fun <R> color(value: ChatMessage.Color, block: ChatMessageBuilder.() -> R): R {
         val builder = ChatMessageBuilder()
         val result = builder.block()
-        chats += ChatMessage(color = value, extra = builder.chats)
+        chats += ChatMessage("", color = value, extra = builder.chats)
         return result
     }
 
-    fun build() = ChatMessage(extra = chats)
+    fun build() = ChatMessage("", extra = chats)
 }
 
 @ChatMessageDsl
 inline fun buildChat(block: ChatMessageBuilder.() -> Unit): ChatMessage {
     val builder = ChatMessageBuilder()
     builder.block()
-    return builder.build().flatten()
+    val chat = builder.build().flatten()
+    if (chat.extra.size == 1)
+        return chat.extra[0]
+    return chat
 }
 
 fun parseControlSequences(value: String): ChatMessage {
@@ -129,4 +133,8 @@ fun parseControlSequences(value: String): ChatMessage {
             ChatMessage("", extra = list)
         }
     }
+}
+
+fun List<ChatMessage>.toChatString(): String {
+    return json.stringify(ChatMessageJsonSerializer.list, this)
 }
