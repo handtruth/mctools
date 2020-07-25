@@ -1,3 +1,8 @@
+**WARNING:** Moved to
+https://github.com/handtruth/mc-tools/tree/master/modules/client,
+https://github.com/handtruth/mc-tools/tree/master/modules/mojang-api and
+https://github.com/handtruth/mc-tools/tree/master/modules/chat
+
 Minecraft Tools
 ======================================
 
